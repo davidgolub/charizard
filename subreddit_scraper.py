@@ -15,3 +15,16 @@ for i in range(0, 100):
 
 json.dumps("results.json", all_results)
 print(len(all_results))
+
+# Republic and Democrat
+# Mac vs. Windows
+# AskMen vs. AskWomen
+# Redpill BluePill
+# Pokemon Digimon
+# Funny Sad
+# Stanford vs. Berkeley
+# Crypto: Bitcoin vs. Ethereum
+# PS3 vs. XBox
+# Android vs. IOS
+# Nike Addidas
+# Prolife vs. Prochoice
