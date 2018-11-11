@@ -1,30 +1,60 @@
-#https://api.pushshift.io/reddit/search/submission/?subreddit=learnpython&sort=desc&sort_type=created_utc&after=1523588521&size=100000
 import requests
 import json
-start_date = 1523588521
-subreddit = 'learnpython'
-url = "https://api.pushshift.io/reddit/search/submission/?subreddit=%s&sort=desc&sort_type=created_utc&after=%s&size=1000"
+import os
 
-all_results = []
+# Thousands of posts to scrape
+n = 100
+# Subreddits to scrape
+subreddits = [
+    'learnpython',
+    'cpp',
+    'Republican',
+    'Democrat',
+    'mac',
+    'windows',
+    'askmen',
+    'askwomen',
+    'redpill',
+    'bluepill',
+    'pokemon',
+    'digimon',
+    'funny',
+    'sad',
+    'stanford',
+    'berkeley',
+    'bitcoin',
+    'ethereum',
+    'ps3',
+    'xbox',
+    'android',
+    'ios',
+    'nike',
+    'adidas',
+    'prolife',
+    'prochoice'
+    ]
+# Where to store data
+data_dir = 'data/'
+if not os.path.exists(data_dir):
+    os.makedirs(data_dir)
 
-for i in range(0, 100):
-    print("On index %s of %s" % (i, i))
-    data = json.loads(requests.get(url % (subreddit, start_date)).content)['data']
-    start_date = data[-1]['created_utc']
-    all_results.extend(data)
+url_template = "https://api.pushshift.io/reddit/search/submission/?subreddit=%s&sort=desc&sort_type=created_utc&after=%s&size=1000"
 
-json.dumps("results.json", all_results)
-print(len(all_results))
+for i, subreddit in enumerate(subreddits):
+  # Reset scrape start date
+  start_date = 1523588521
+  all_results = []
+  try:
+    for j in range(0, n):
+      if j % 10 == 0:
+        print("On index %d of %d for subreddit %s (%d/%d)." % (j + 1, n, subreddit, i + 1, len(subreddits)))
 
-# Republic and Democrat
-# Mac vs. Windows
-# AskMen vs. AskWomen
-# Redpill BluePill
-# Pokemon Digimon
-# Funny Sad
-# Stanford vs. Berkeley
-# Crypto: Bitcoin vs. Ethereum
-# PS3 vs. XBox
-# Android vs. IOS
-# Nike Addidas
-# Prolife vs. Prochoice
+      data = json.loads(requests.get(url_template % (subreddit, start_date)).content)['data']
+      if len(data):
+        start_date = data[-1]['created_utc']
+        all_results.extend(data)
+
+    json.dump(all_results, open("data/results_%s.json" % subreddit, 'w'))
+  except Exception as e:
+    print('Error :(((((((')
+    print(e)
