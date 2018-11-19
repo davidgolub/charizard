@@ -33,6 +33,12 @@ main_dict_num=3000
 main_dict_thre=5
 fi
 main_dev_num=1000
+elif [ "$main_data" = "republican" ]; then
+if [ ! -n "$main_dict_num" ]; then
+main_dict_num=3000
+main_dict_thre=5
+fi
+main_dev_num=1000
 elif [ "$main_data" = "amazon" ]; then
 if [ ! -n "$main_dict_num" ]; then
 main_dict_num=10000

@@ -44,9 +44,9 @@ class ModelManager :
         print ('Start to train.') 
         epoch = 0
         if n_batches>200:
-            n_epochs = 30
+            n_epochs = 2
         else:
-            n_epochs = 70
+            n_epochs = 2
         it = 0
         test_errors=[]
         min_error=1000000
