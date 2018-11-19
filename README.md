@@ -1,14 +1,3 @@
+https://github.com/lijuncen/Sentiment-and-Style-Transfer
 
-
-# Republic and Democrat
-# Mac vs. Windows
-# AskMen vs. AskWomen
-# Redpill BluePill
-# Pokemon Digimon
-# Funny Sad
-# Stanford vs. Berkeley
-# Crypto: Bitcoin vs. Ethereum
-# PS3 vs. XBox
-# Android vs. IOS
-# Nike Addidas
-# Prolife vs. Prochoice
+https://arxiv.org/pdf/1804.06437.pdf
