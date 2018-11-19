@@ -55,7 +55,7 @@ for pair in pairs:
 
     for split_data, split in [(train_data, "train"), (dev_data, "dev"),
                               (test_data, "test")]:
-      output_filename = 'data.%s.%s' % (split, str(i))
+      output_filename = 'sentiment.%s.%s' % (split, str(i))
       with open(os.path.join(pair_output_dir, output_filename), 'w') as file:
         for data in split_data:
           try:

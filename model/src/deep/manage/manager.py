@@ -35,6 +35,7 @@ class ModelManager :
         n_train_set, n_valid_set, n_test_set = self.cr.get_size()
         n_batches = (n_train_set - 1) / self.conf_dict['batch_size'] + 1
         n_test_batches=(n_test_set - 1) / self.conf_dict['batch_size'] + 1 
+        print n_train_set, n_valid_set, n_test_set, n_batches, n_test_batches
         train_model = self.model.get_training_function(self.cr, batch_size=self.conf_dict['batch_size'],
                                                        batch_repeat=1)
         print ('train_model_data')
@@ -44,9 +45,11 @@ class ModelManager :
         print ('Start to train.') 
         epoch = 0
         if n_batches>200:
-            n_epochs = 2
+            n_epochs = 30
         else:
-            n_epochs = 2
+            n_epochs = 70
+        n_epochs = 30
+        print ('n_epochs: {}'.format(n_epochs))
         it = 0
         test_errors=[]
         min_error=1000000

@@ -1,24 +1,27 @@
 import sys
 import random
 import string
+from tqdm import tqdm
+from Levenshtein import distance
 operation=sys.argv[3]
 dict_num=string.atof(sys.argv[4])
 dict_thre=string.atof(sys.argv[5])
 
 def levenshteinDistance(s1, s2):
-    if len(s1) > len(s2):
-        s1, s2 = s2, s1
+	return distance(''.join(s1),''.join(s2))
+	# if len(s1) > len(s2):
+	#     s1, s2 = s2, s1
 
-    distances = range(len(s1) + 1)
-    for i2, c2 in enumerate(s2):
-        distances_ = [i2+1]
-        for i1, c1 in enumerate(s1):
-            if c1 == c2:
-                distances_.append(distances[i1])
-            else:
-                distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
-        distances = distances_
-    return distances[-1]
+	# distances = range(len(s1) + 1)
+	# for i2, c2 in enumerate(s2):
+	#     distances_ = [i2+1]
+	#     for i1, c1 in enumerate(s1):
+	#         if c1 == c2:
+	#             distances_.append(distances[i1])
+	#         else:
+	#             distances_.append(1 + min((distances[i1], distances[i1 + 1], distances_[-1])))
+	#     distances = distances_
+	# return distances[-1]
 
 
 f=open(sys.argv[2]+'.tf_idf'+'.'+operation,'r')
@@ -46,7 +49,10 @@ f=open(sys.argv[1],'r')
 fw=open(sys.argv[6]+'.data.'+operation,'w')
 total_num=0
 change_num=0
-for line in f:
+for line in tqdm(f):
+	# import random
+	# if random.random() < .99:
+	# 	continue
 	try:
 		lines=line.strip().decode('utf-8').encode('gb18030').split(' ')
 	except:

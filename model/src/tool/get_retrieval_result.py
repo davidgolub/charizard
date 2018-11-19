@@ -1,7 +1,7 @@
 import sys
 for i in range(2):
-	f=open('sentiment.test.'+str(i)+'.template.orgin.emb.result.filter.result','r')
-	fw=open('sentiment.test.'+str(i)+'.retrieval','w')
+	f=open(sys.argv[1] + 'sentiment.test.'+str(i)+'.template.orgin.emb.result.filter.result','r')
+	fw=open(sys.argv[1] + 'sentiment.test.'+str(i)+'.retrieval','w')
 	tmp=''
 	tmp_array=[]
 	for line in f:
