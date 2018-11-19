@@ -20,7 +20,8 @@ elif [ "$main_function" = "RetrieveOnly" ]; then
 main_function=orgin
 fi
 
-if [ "$main_data" = "yelp" ]; then
+
+if [ "$main_data" = "askmenwomen" ]; then
 if [ ! -n "$main_dict_num" ]; then
 main_dict_num=7000
 main_dict_thre=15
@@ -40,7 +41,8 @@ fi
 main_dev_num=2000
 fi
 
-main_category=sentiment
+
+main_category=data
 main_category_num=2
 #configure
 preprocess_tool_path=src/tool/
@@ -59,8 +61,10 @@ if [ "$main_operation" = "train" ]; then
 echo train
 
 #preprocess train data
+echo "preprocessing"
 python2.7 ${preprocess_tool_path}filter_style_ngrams.py $orgin_train_file_prefix $main_category_num $main_function $train_file_prefix
 if [ "$main_data" = "amazon" ]; then
+echo "done preprocessing"
 for((i=0;i < $main_category_num; i++))
 do
         python2.7 ${preprocess_tool_path}use_nltk_to_filter.py ${train_file_prefix}${i}.tf_idf.$main_function
@@ -68,19 +72,24 @@ do
 done
 fi
 
+echo "done preprocessing yet again"
 for((i=0;i < $main_category_num; i++))
 do
-        python2.7 ${preprocess_tool_path}preprocess_train.py ${orgin_train_file_prefix}${i} ${train_file_prefix}${i} ${main_function} ${main_dict_num} ${main_dict_thre} ${train_file_prefix}${i}
-        python2.7 ${preprocess_tool_path}preprocess_test.py ${orgin_dev_file_prefix}${i} ${train_file_prefix}${i} $main_function $main_dict_num $main_dict_thre ${dev_file_prefix}${i}
+    echo "Processing on category " + $i
+    python2.7 ${preprocess_tool_path}preprocess_train.py ${orgin_train_file_prefix}${i} ${train_file_prefix}${i} ${main_function} ${main_dict_num} ${main_dict_thre} ${train_file_prefix}${i}
+    python2.7 ${preprocess_tool_path}preprocess_test.py ${orgin_dev_file_prefix}${i} ${train_file_prefix}${i} $main_function $main_dict_num $main_dict_thre ${dev_file_prefix}${i}
 done
+echo "Done preprocessing next"
 cat ${train_file_prefix}*.data.${main_function} >> $train_data_file
 cat ${dev_file_prefix}*.data.${main_function} >> $test_data_file
 python2.7 ${preprocess_tool_path}shuffle.py $train_data_file
 python2.7 ${preprocess_tool_path}shuffle.py $test_data_file
+echo "Done shuffling"
 cat ${test_data_file}.shuffle >>${train_data_file}.shuffle
 cp ${train_data_file}.shuffle ${train_data_file}
 python2.7 ${preprocess_tool_path}create_dict.py ${train_data_file} $dict_data_file
-
+echo "Done creating dict"
+echo "Done on this line12333"
 line_num=$(wc -l < $train_data_file)
 vt=$main_dev_num
 eval $(awk 'BEGIN{printf "train_num=%.6f",'$line_num'-'$vt'}')
@@ -89,7 +98,7 @@ vaild_num=0
 eval $(awk 'BEGIN{printf "train_rate=%.6f",'$train_num'/'$line_num'}')
 eval $(awk 'BEGIN{printf "vaild_rate=%.6f",'$vaild_num'/'$line_num'}')
 eval $(awk 'BEGIN{printf "test_rate=%.6f",'$test_num'/'$line_num'}')
-
+echo "Now we're TRAINING!!!!"
 #train process
 THEANO_FLAGS="${THEANO_FLAGS}" python2.7 src/main.py ../model $train_data_file $dict_data_file src/aux_data/stopword.txt src/aux_data/embedding.txt $train_rate $vaild_rate $test_rate ChoEncoderDecoderDT train $batch_size
 
