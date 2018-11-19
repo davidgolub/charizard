@@ -44,7 +44,6 @@ fi
 main_dev_num=2000
 fi
 
-# main_category=data
 main_category=sentiment
 main_category_num=2
 #configure
@@ -82,9 +81,9 @@ do
     python2.7 ${preprocess_tool_path}preprocess_test.py ${orgin_dev_file_prefix}${i} ${orgin_train_file_prefix}${i} $main_function $main_dict_num $main_dict_thre ${dev_file_prefix}${i}
 done
 
-# echo "copying files"
-# cat ${train_file_prefix}*.data.${main_function} >> $train_data_file
-# cat ${dev_file_prefix}*.data.${main_function} >> $test_data_file
+echo "copying files"
+cat ${train_file_prefix}*.data.${main_function} >> $train_data_file
+cat ${dev_file_prefix}*.data.${main_function} >> $test_data_file
 
 echo "shuffling"
 python2.7 ${preprocess_tool_path}shuffle.py $train_data_file
@@ -127,7 +126,7 @@ python2.7 ${preprocess_tool_path}retrieve_mode_my_0.py
 for((i=0;i < $main_category_num; i++))
 do
 	python2.7 ${preprocess_tool_path}build_templatebased.py ${test_file_prefix}${i}.template1.result ${orgin_test_file_prefix}${i}
-	cp ${test_file_prefix}${i}.template1.result.result ${test_file_prefix}${i}.${main_function}.$main_data
+	cp ${test_file_prefix}${i}.template1.result ${test_file_prefix}${i}.${main_function}.$main_data
 done
 
 exit
@@ -135,7 +134,6 @@ fi
 
 
 #preprocess test data
-# cp run-bash/* ./
 line_num=$(wc -l < $train_data_file)
 vt=$main_dev_num
 eval $(awk 'BEGIN{printf "train_num=%.6f",'$line_num'-'$vt'}')
@@ -152,7 +150,7 @@ do
         python2.7 ${preprocess_tool_path}filter_template.py ${train_file_prefix}${i} ${main_function}
 done
 
-printf "\n\n\ntrain aux\n"
+printf "\n\n\ngenerate embeddings\n"
 for((i=0;i<$main_category_num;i++))
 do
 	THEANO_FLAGS="${THEANO_FLAGS}" python2.7 src/main.py ../model $train_data_file $dict_data_file src/aux_data/stopword.txt src/aux_data/embedding.txt $train_rate $vaild_rate $test_rate ChoEncoderDecoderDT generate_emb ${test_file_prefix}${i}.template.${main_function} $batch_size
@@ -187,6 +185,8 @@ cp ${test_file_prefix}${i}.retrieval ${test_file_prefix}${i}.${main_function_org
 done
 exit
 fi
+
+echo "building data, shuffling, creating dicts"
 for((i=0;i<$main_category_num;i++))
 do
 	python2.7 ${preprocess_tool_path}build_lm_data.py ${orgin_train_file_prefix}${i} ${train_file_prefix}${i}
@@ -195,6 +195,8 @@ do
 	python2.7 ${preprocess_tool_path}create_dict.py ${train_file_prefix}${i}.lm ${train_file_prefix}${i}.lm.dict
 done
 
+
+printf "\n\n\n ChoEncoderDecoderLm\n"
 for((i=0;i<$main_category_num;i++))
 do
 	vaild_num=$i
@@ -202,6 +204,8 @@ do
 	THEANO_FLAGS="${THEANO_FLAGS}" python2.7 src/main.py ../model ${train_file_prefix}${i}.lm ${train_file_prefix}${i}.lm.dict src/aux_data/stopword.txt src/aux_data/embedding.txt $train_rate $vaild_rate $test_rate ChoEncoderDecoderLm train $batch_size
 done
 vaild_num=0
+
+printf "\n\n\n ChoEncoderDecoderLm generate_b_v_t_v\n"
 i=0
 eval $(awk 'BEGIN{printf "vaild_rate=%.10f",'$vaild_num'/'$line_num'}')
 THEANO_FLAGS="${THEANO_FLAGS}" python2.7 src/main.py ../model ${train_file_prefix}${i}.lm ${train_file_prefix}${i}.lm.dict src/aux_data/stopword.txt src/aux_data/embedding.txt $train_rate $vaild_rate $test_rate ChoEncoderDecoderLm generate_b_v_t_v ${test_file_prefix}1.template.${main_function}.emb.result.filter.result $batch_size
@@ -212,8 +216,8 @@ THEANO_FLAGS="${THEANO_FLAGS}" python2.7 src/main.py ../model ${train_file_prefi
 
 for((i=0;i<$main_category_num;i++))
 do
-        python2.7 ${preprocess_tool_path}get_final_result.py ${test_file_prefix}${i}.template.${main_function}.emb.result.filter.result.result ${i}
-	cp ${test_file_prefix}${i}.template.${main_function}.emb.result.filter.result.result.final_result ${test_file_prefix}${i}.${main_function_orgin}.$main_data
+  python2.7 ${preprocess_tool_path}get_final_result.py ${test_file_prefix}${i}.template.${main_function}.emb.result.filter.result ${i}
+	cp ${test_file_prefix}${i}.template.${main_function}.emb.result.filter.result.final_result ${test_file_prefix}${i}.${main_function_orgin}.$main_data
 
 done
 
