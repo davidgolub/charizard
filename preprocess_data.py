@@ -47,15 +47,17 @@ for pair in pairs:
         extracted_field = thread[extraction_field].lower()
         for sentence in extracted_field.split('.'):
           sentence = ' '.join(nltk.word_tokenize(sentence))
-          for delete in [' & ', '�', ' ; ', ' : ', ' # ', '!#', '``', '\'\'', '[ ]', '( )', '# ']:
+          for delete in ['�']:
             sentence = sentence.replace(delete, '')
           sentence = ''.join([c for c in sentence if ord(c) < 256 and \
               (c == ' ' or c.isalnum() or c == '.' or c == ',' or c == ':' or c == '?' or c == '!')])
+          sentence = ' '.join([word if not word.isdigit() else 'num_num' for word in sentence.split(' ')])
+          sentence = ''.join([c for c in sentence if not c.isdigit()])
           sentence = ' '.join([word for word in sentence.split(' ') \
               if not any ([block_word in word \
                   for block_word in ['.net', '.org', 'x20', '.com', 'https', 'amp']])
               and any([c.isalnum() for c in word])])
-          sentence = sentence.replace('[ ]', '').replace('( )', '')
+          
           sentence = sentence.replace('  ', ' ')
           # print(sentence)
           if sentence.count(' ') > 5:
