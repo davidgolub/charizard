@@ -45,18 +45,21 @@ for pair in pairs:
           '[removed]' not in thread[extraction_field] and
           '[deleted]' not in thread[extraction_field]):
         extracted_field = thread[extraction_field].lower()
-        sentence = ' '.join(nltk.word_tokenize(extracted_field))
-        for delete in [' & ', '�', ' ; ', ' : ', ' # ', '!#', '``', '\'\'', '[ ]', '( )', '# ']:
-          sentence = sentence.replace(delete, '')
-        sentence = ''.join([c for c in sentence if ord(c) < 256])
-        sentence = ' '.join([word for word in sentence.split(' ') \
-            if not any ([block_word in word \
-                for block_word in ['.net', '.org', 'x20', '.com', 'https', 'amp']])])
-        sentence = sentence.replace('[ ]', '').replace('( )', '')
-        sentence = sentence.replace('  ', ' ')
-        # print(sentence)
-        if sentence.count(' ') > 10:
-          output_data.add(sentence)
+        for sentence in extracted_field.split('.'):
+          sentence = ' '.join(nltk.word_tokenize(sentence))
+          for delete in [' & ', '�', ' ; ', ' : ', ' # ', '!#', '``', '\'\'', '[ ]', '( )', '# ']:
+            sentence = sentence.replace(delete, '')
+          sentence = ''.join([c for c in sentence if ord(c) < 256 and \
+              (c == ' ' or c.isalnum() or c == '.' or c == ',' or c == ':' or c == '?' or c == '!')])
+          sentence = ' '.join([word for word in sentence.split(' ') \
+              if not any ([block_word in word \
+                  for block_word in ['.net', '.org', 'x20', '.com', 'https', 'amp']])
+              and any([c.isalnum() for c in word])])
+          sentence = sentence.replace('[ ]', '').replace('( )', '')
+          sentence = sentence.replace('  ', ' ')
+          # print(sentence)
+          if sentence.count(' ') > 5:
+            output_data.add(sentence + ' .')
 
     output_data = list(output_data)
     print(len(output_data))
