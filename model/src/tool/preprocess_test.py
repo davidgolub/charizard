@@ -1,7 +1,6 @@
 import sys
 import random
 import string
-from tqdm import tqdm
 from Levenshtein import distance
 operation=sys.argv[3]
 dict_num=string.atof(sys.argv[4])
@@ -49,7 +48,7 @@ f=open(sys.argv[1],'r')
 fw=open(sys.argv[6]+'.data.'+operation,'w')
 total_num=0
 change_num=0
-for line in tqdm(f):
+for line in f:
 	try:
 		lines=line.strip().decode('utf-8').encode('gb18030').split(' ')
 	except:

@@ -3,6 +3,7 @@ import time
 from scipy import spatial
 import numpy as np
 import string
+from tqdm import tqdm
 main_data=sys.argv[2]
 main_function=sys.argv[3]
 data_dir=sys.argv[4] + '/'
@@ -29,7 +30,7 @@ f1.close()
 
 f=open(data_dir + 'sentiment.test.'+sys.argv[1]+'.template.'+main_function+'.emb','r')
 fw=open(data_dir + 'sentiment.test.'+sys.argv[1]+'.template.'+main_function+'.emb.result','w')
-for line in f:
+for line in tqdm(f):
 	sen1,arr1=process_line(line)
 	tmp_sen_score_dict={}
 	if(main_function=='label'):

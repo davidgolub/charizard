@@ -48,7 +48,7 @@ class ModelManager :
             n_epochs = 30
         else:
             n_epochs = 70
-        n_epochs = 30
+        n_epochs = 15
         print ('n_epochs: {}'.format(n_epochs))
         it = 0
         test_errors=[]
@@ -93,7 +93,7 @@ class ModelManager :
             final_parameter=self.model.get_parameters()
             save_params_val(self.param_path,final_parameter)
         final_path=self.param_path+str(min_error_index)
-        #save_params_val(self.param_path,final_parameter)
+        # save_params_val(self.param_path,final_parameter)
         print final_path
 
             

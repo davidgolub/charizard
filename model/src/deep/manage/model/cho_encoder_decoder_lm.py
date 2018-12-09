@@ -26,10 +26,11 @@ class RnnEncoderDecoder(ModelManager) :
                           'hidden_dim': 512, 'charset': charset, 'shuffle': False,
                           'save_freq': 100}
         self.param_path = get_params_file_name(self.conf_dict) + '.model'
-        print self.param_path
         #self.param_path ='ChoEncoderDecoderTopic_5908276eb2ae513520ca72135e5b82d0.model83'
         #self.param_path='ChoEncoderDecoderDT_4575b6c5893c10a009e29b6eb2988387.model42'
         #self.param_path='ChoEncoderDecoderDT_cc7f5ed5d9e9fe5a90a012f4e017106a.model'
+        # self.param_path='ChoEncoderDecoderDT_1763264503445eaa2406f11fcbf1cfef.model'
+        print self.param_path
         param_dict = load_params_val(self.param_path)
         self.conf_path = os.path.join(dataset_folder, 'model', 'dialog', get_params_file_name(self.conf_dict) + '.conf')
         save_confs_val(self.conf_dict, self.conf_path)
