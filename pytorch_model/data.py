@@ -37,7 +37,7 @@ class CorpusSearcher(object):
 
         # use the retrieved i to pick examples from the VALUE corpus
         selected = [
-            (self.query_corpus[i], self.key_corpus[i], self.value_corpus[i], i, score) 
+            (self.key_corpus[i], self.value_corpus[i], i, score) 
             for (score, i) in selected
         ]
 
@@ -146,7 +146,7 @@ def sample_replace(lines, dist_measurer, sample_rate, corpus_idx):
             sims = dist_measurer.most_similar(corpus_idx + i)[1:]  # top match is the current line
             try:
                 line = next( (
-                    tgt_attr.split() for src_cntnt, tgt_cntnt, tgt_attr, _, _ in sims
+                    tgt_attr.split() for tgt_cntnt, tgt_attr, _, _ in sims
                     if tgt_attr != ' '.join(line) # and tgt_attr != ''   # TODO -- exclude blanks?
                 ) )
             # all the matches are blanks
@@ -274,6 +274,3 @@ def unsort(arr, idx):
     for i, origin in enumerate(idx):
         unsorted_arr[origin] = arr[i]
     return unsorted_arr
-
-
-
