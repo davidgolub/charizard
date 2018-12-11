@@ -1,5 +1,4 @@
-# file for david liang to play around with and not have to type args all the time
-
+# example train shell script
 set -e
 
 # main_category=ps3_xbox
