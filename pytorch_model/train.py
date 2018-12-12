@@ -11,7 +11,7 @@ import os
 import time
 import numpy as np
 import glob
-
+import tqdm
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -43,8 +43,11 @@ config = json.load(open(args.config, 'r'))
 
 working_dir = config['data']['working_dir']
 
-if not os.path.exists(working_dir):
-    os.makedirs(working_dir)
+config['data']['working_dir'] = "output/{}_{}/".format(working_dir, len(glob.glob("output/{}*/".format(working_dir))))
+working_dir = config['data']['working_dir']
+os.makedirs(working_dir)
+    
+
 
 config_path = os.path.join(working_dir, 'config.json')
 if not os.path.exists(config_path):
@@ -158,7 +161,8 @@ for epoch in range(start_epoch, config['training']['epochs']):
         best_epoch = epoch - 1
 
     losses = []
-    for i in range(0, len(src['content']), batch_size):
+    t = tqdm.tqdm(range(0, len(src['content']), batch_size))
+    for i in t:
 
         if args.overfit:
             i = 50
@@ -200,6 +204,7 @@ for epoch in range(start_epoch, config['training']['epochs']):
             writer.add_scalar('stats/WPS', wps, STEP)
             writer.add_scalar('stats/loss', avg_loss, STEP)
             logging.info('EPOCH: %s ITER: %s/%s WPS: %.2f LOSS: %.4f METRIC: %.4f' % info)
+            # t.set_description('EPOCH: %s ITER: %s/%s WPS: %.2f LOSS: %.4f METRIC: %.4f' % info)
             start_since_last_report = time.time()
             words_since_last_report = 0
             losses_since_last_report = []
