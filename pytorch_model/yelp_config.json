@@ -1,7 +1,7 @@
 {
     "training": {
       "optimizer": "sgd",
-      "learning_rate": 0.1,
+      "learning_rate": 0.01,
       "max_norm": 3.0,
       "epochs": 100,
       "batches_per_report": 1,
@@ -9,28 +9,28 @@
       "random_seed": 1
     },
     "data": {
-      "src": "data/yelp_shrunken/sentiment.train.0",
-      "tgt": "data/yelp_shrunken/sentiment.train.1",
-      "src_test": "data/yelp_shrunken/sentiment.test.0",
-      "tgt_test": "data/yelp_shrunken/sentiment.test.1",
-      "src_vocab": "data/yelp_shrunken/train.0.vocab.16k",
-      "tgt_vocab": "data/yelp_shrunken/train.0.vocab.16k",
+      "src": "data/yelp_mini/sentiment.train.0",
+      "tgt": "data/yelp_mini/sentiment.train.1",
+      "src_test": "data/yelp_mini/sentiment.test.0",
+      "tgt_test": "data/yelp_mini/sentiment.test.1",
+      "src_vocab": "data/yelp_mini/vocab.16k",
+      "tgt_vocab": "data/yelp_mini/vocab.16k",
       "share_vocab": true,
-      "attribute_vocab": "data/yelp_shrunken/0.attribute_vocab.16k",
+      "attribute_vocab": "data/yelp_mini/0.attribute_vocab.16k",
       "batch_size": 32,
       "max_len": 50,
-      "working_dir": "yelp_shrunken"
+      "working_dir": "yelp_mini"
     },
     "model": {
         "model_type": "delete_retrieve",
-        "emb_dim": 256,
-        "attention": true,
+        "emb_dim": 128,
+        "attention": false,
         "encoder": "lstm",
-        "src_hidden_dim": 512,
-        "src_layers": 2,
+        "src_hidden_dim": 256,
+        "src_layers": 1,
         "bidirectional": true,
-        "tgt_hidden_dim": 512,
-        "tgt_layers": 2,
+        "tgt_hidden_dim": 256,
+        "tgt_layers": 1,
         "decode": "greedy",
         "dropout": 0.2
     }

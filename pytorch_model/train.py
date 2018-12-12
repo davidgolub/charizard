@@ -83,6 +83,10 @@ src_test, tgt_test = data.read_nmt_data(
     train_src=src,
     train_tgt=tgt
 )
+assert len(src) > 0
+assert len(tgt) > 0
+assert len(src_test) > 0
+assert len(tgt_test) > 0
 logging.info('...done!')
 
 
@@ -161,8 +165,9 @@ for epoch in range(start_epoch, config['training']['epochs']):
         best_epoch = epoch - 1
 
     losses = []
-    t = tqdm.tqdm(range(0, len(src['content']), batch_size))
-    for i in t:
+    # t = tqdm.tqdm(range(0, len(src['content']), batch_size))
+    # for i in t:
+    for i in range(0, len(src['content']), batch_size):
 
         if args.overfit:
             i = 50

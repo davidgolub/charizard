@@ -3,7 +3,7 @@
     "optimizer": "sgd",
     "learning_rate": 0.01,
     "max_norm": 3.0,
-    "epochs": 100,
+    "epochs": 250,
     "batches_per_report": 1,
     "batches_per_sampling": 500,
     "random_seed": 1
@@ -11,15 +11,16 @@
   "data": {
     "src": "data/amazon_shrunken/sentiment.train.0",
     "tgt": "data/amazon_shrunken/sentiment.train.1",
-    "src_test": "data/amazon_shrunken/sentiment.test.0",
-    "tgt_test": "data/amazon_shrunken/sentiment.test.1",
-    "src_vocab": "data/amazon_shrunken/vocab.16k",
-    "tgt_vocab": "data/amazon_shrunken/vocab.16k",
+    "src_test": "data/yelp_shrunken/sentiment.test.0",
+    "tgt_test": "data/yelp_shrunken/sentiment.test.1",
+    "src_vocab": "data/transfer/vocab.16k",
+    "tgt_vocab": "data/transfer/vocab.16k",
     "share_vocab": true,
-    "attribute_vocab": "data/amazon_shrunken/0.attribute_vocab.16k",
+    "src_attribute_vocab": "data/amazon_shrunken/0.attribute_vocab.16k",
+    "tgt_attribute_vocab": "data/amazon_shrunken/1.attribute_vocab.16k",
     "batch_size": 32,
     "max_len": 50,
-    "working_dir": "amazon_shrunken"
+    "working_dir": "transfer"
   },
   "model": {
       "model_type": "delete_retrieve",

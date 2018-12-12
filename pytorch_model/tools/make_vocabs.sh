@@ -7,6 +7,10 @@ else
   rm -rf $entire_corpus
   cat data/$1/sentiment.train.0 >> $entire_corpus
   cat data/$1/sentiment.train.1 >> $entire_corpus
+  cat data/$1/sentiment.dev.0 >> $entire_corpus
+  cat data/$1/sentiment.dev.1 >> $entire_corpus
+  cat data/$1/sentiment.test.0 >> $entire_corpus
+  cat data/$1/sentiment.test.1 >> $entire_corpus
   echo "Making combined vocab"
   python tools/make_vocab.py $entire_corpus 16000 > data/$1/vocab.16k
   echo "Making attribute vocab"

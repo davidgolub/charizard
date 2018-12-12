@@ -1,7 +1,7 @@
 {
   "training": {
     "optimizer": "sgd",
-    "learning_rate": 0.1,
+    "learning_rate": 0.01,
     "max_norm": 3.0,
     "epochs": 100,
     "batches_per_report": 1,
@@ -23,13 +23,13 @@
   },
   "model": {
       "model_type": "delete_retrieve",
-      "emb_dim": 128,
+      "emb_dim": 64,
       "attention": false,
       "encoder": "lstm",
-      "src_hidden_dim": 512,
+      "src_hidden_dim": 256,
       "src_layers": 1,
       "bidirectional": true,
-      "tgt_hidden_dim": 512,
+      "tgt_hidden_dim": 256,
       "tgt_layers": 1,
       "decode": "greedy",
       "dropout": 0.2
