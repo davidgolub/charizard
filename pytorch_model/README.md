@@ -4,7 +4,8 @@ This is an implementation of the DeleteOnly and DeleteAndRetrieve models from th
 # Usage
 
 ### Bert server
-bert-serving-start -model_dir /Users/golubd/Downloads/cased_L-24_H-1024_A-16
+wget https://storage.googleapis.com/bert_models/2018_10_18/cased_L-24_H-1024_A-16.zip YOUR_LOCATION
+bert-serving-start -model_dir YOUR_LOCATION
 
 ### Training
 `python train.py --config sample_config.json --bleu`
