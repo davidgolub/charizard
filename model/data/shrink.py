@@ -2,9 +2,10 @@ import os
 import shutil
 
 shrink_dirs = ['yelp', 'amazon']
+shrink_factor = 3
 
 for shrink_dir in shrink_dirs:
-  new_dir = '{}_shrunken/'.format(shrink_dir)
+  new_dir = '{}_mini/'.format(shrink_dir)
   if not os.path.isdir(new_dir):
     os.makedirs(new_dir)
 
@@ -14,7 +15,7 @@ for shrink_dir in shrink_dirs:
     with open(filename,'r') as f:
       lines = f.readlines()
       orig_len = len(lines)
-      lines = lines[:len(lines) // 10]
+      lines = lines[:len(lines) // shrink_factor]
       print("new vs old lengths: {} vs {}".format(len(lines), orig_len))
     new_filename = '{}/sentiment.train.{}'.format(new_dir, i)
     print(new_filename)
