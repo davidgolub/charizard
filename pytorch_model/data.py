@@ -107,7 +107,7 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
         query_corpus=[' '.join(x) for x in src_attribute],
         key_corpus=[' '.join(x) for x in src_attribute],
         value_corpus=[' '.join(x) for x in src_attribute],
-        vectorizer=CountVectorizer(vocabulary=src_tok2id),
+        vectorizer=BertVectorizer(),#CountVectorizer(vocabulary=src_tok2id),
         make_binary=True
     )
     src = {
@@ -126,7 +126,7 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
             query_corpus=[' '.join(x) for x in tgt_attribute],
             key_corpus=[' '.join(x) for x in tgt_attribute],
             value_corpus=[' '.join(x) for x in tgt_attribute],
-            vectorizer=CountVectorizer(vocabulary=tgt_tok2id),
+            vectorizer=BertVectorizer(),#CountVectorizer(vocabulary=tgt_tok2id),
             make_binary=True
         )
     # at test time, use test src-side content to scan through train tgt-side content
@@ -136,7 +136,7 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
             query_corpus=[' '.join(x) for x in src_content],
             key_corpus=[' '.join(x) for x in train_tgt['content']],
             value_corpus=[' '.join(x) for x in train_tgt['attribute']],
-            vectorizer=TfidfVectorizer(vocabulary=tgt_tok2id),
+            vectorizer=BertVectorizer(),#TfidfVectorizer(vocabulary=tgt_tok2id),
             make_binary=False
         )
     tgt = {
