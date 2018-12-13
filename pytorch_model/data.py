@@ -15,30 +15,42 @@ import tensorflow_hub as hub
 from cuda import CUDA
 
 
-class BertVectorizer(object):
+class Vectorizer(object):
     def __init__(self):
-        self.bc = BertClient()
+        self.encodings = {}
 
     def fit(self, documents):
         return
 
     def transform(self, documents):
-        encodings = self.bc.encode([doc if doc else " " for doc in documents if doc])
-        return np.squeeze(encodings)
+        encoded_documents = []
+        for document in documents:
+            if document in self.encodings:
+                encoded_documents.append(self.encodings[document])
+            else:
+                encoding = self.encode(document)
+                self.encodings[document] = encoding
+                encoded_documents.append(encoding)
+        return np.vstack(encoded_documents)
 
 
-class TFHubVectorizer(object):
+class BertVectorizer(Vectorizer):
     def __init__(self):
-        self.inputs = tf.placeholder(tf.string, shape=(None))
-        self.encodings = self.embed(self.inputs)
+        super(BertVectorizer, self).__init__()
+        self.bc = BertClient()
+
+    def encode(self, document):
+        return np.squeeze(self.bc.encode([document if document else " "]))
+
+
+class TFHubVectorizer(Vectorizer):
+    def __init__(self):
+        super(TFHubVectorizer, self).__init__()
         self.sess = tf.Session()
         self.sess.run([tf.global_variables_initializer(), tf.tables_initializer()])
 
-    def fit(self, documents):
-        return
-
-    def transform(self, documents):
-        return self.sess.run(self.embed(documents))
+    def encode(self, document):
+        return np.squeeze(self.sess.run(self.embed([document])))
 
 
 class UniversalEncoderVectorizer(TFHubVectorizer):
@@ -49,14 +61,13 @@ class UniversalEncoderVectorizer(TFHubVectorizer):
 
 class CorpusSearcher(object):
     def __init__(self, query_corpus, key_corpus, value_corpus, vectorizer, make_binary=True):
-        self.vectorizer = vectorizer
-        self.vectorizer.fit(key_corpus)
-
         self.query_corpus = query_corpus
         self.key_corpus = key_corpus
         self.value_corpus = value_corpus
         
         # rows = docs, cols = features
+        self.vectorizer = vectorizer
+        self.vectorizer.fit(key_corpus)
         self.key_corpus_matrix = self.vectorizer.transform(self.key_corpus)
         if make_binary:
             self.key_corpus_matrix = (self.key_corpus_matrix != 0).astype(int) # make binary
