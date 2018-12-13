@@ -3,12 +3,23 @@ import os
 import random
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from bert_serving.client import BertClient
 
 import torch
 from torch.autograd import Variable
 
 from cuda import CUDA
 
+
+class BertVectorizer(object):
+    def __init__(self):
+        self.bc = BertClient()
+
+    def fit(self, dummy):
+        print("Fitted")
+
+    def transform(self, documents):
+        return self.bc.encode(documents)
 
 class CorpusSearcher(object):
     def __init__(self, query_corpus, key_corpus, value_corpus, vectorizer, make_binary=True):

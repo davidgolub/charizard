@@ -187,6 +187,7 @@ def inference_metrics(model, src, tgt, config):
     edit_distance = get_edit_distance(preds, ground_truths)
     precisions, recalls = get_precisions_recalls(inputs, preds, ground_truths)
 
+
     precision = np.average(precisions)
     recall = np.average(recalls)
 

@@ -3,8 +3,10 @@ This is an implementation of the DeleteOnly and DeleteAndRetrieve models from th
 
 # Usage
 
-### Training
+### Bert server
+bert-serving-start -model_dir /Users/golubd/Downloads/cased_L-24_H-1024_A-16
 
+### Training
 `python train.py --config sample_config.json --bleu`
 
 This will train a model using the parameters in `sample_config.json`. Checkpoints, logs, decodings, and TensorBoard summaries will go into config's `working_dir`.

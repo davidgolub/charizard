@@ -2,3 +2,6 @@ python-Levenshtein
 theano
 tqdm
 nltk
+bert-serving-server
+bert-serving-client
+
