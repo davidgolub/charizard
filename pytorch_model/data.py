@@ -11,6 +11,7 @@ from torch.autograd import Variable
 import tensorflow as tf
 tf.logging.set_verbosity(tf.logging.ERROR)
 import tensorflow_hub as hub
+import sentencepiece as spm
 
 from cuda import CUDA
 
@@ -53,10 +54,46 @@ class TFHubVectorizer(Vectorizer):
         return np.squeeze(self.sess.run(self.embed([document])))
 
 
-class UniversalEncoderVectorizer(TFHubVectorizer):
+class UniversalEncoderLargeVectorizer(TFHubVectorizer):
     def __init__(self):
         self.embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder-large/3")
+        super(UniversalEncoderLargeVectorizer, self).__init__()
+
+
+class UniversalEncoderVectorizer(TFHubVectorizer):
+    def __init__(self):
+        self.embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder/2")
         super(UniversalEncoderVectorizer, self).__init__()
+
+
+class UniversalEncoderLiteVectorizer(TFHubVectorizer):
+    def __init__(self):
+        self.input = tf.sparse_placeholder(tf.int64, shape=[None, None])
+        self.embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder-lite/2")
+        self.encoding = self.embed(
+            inputs=dict(
+                values=self.input.values,
+                indices=self.input.indices,
+                dense_shape=self.input.dense_shape))
+        super(UniversalEncoderLiteVectorizer, self).__init__()
+        spm_path = self.sess.run(self.embed(signature="spm_path"))
+        self.sp = spm.SentencePieceProcessor()
+        self.sp.Load(spm_path)
+
+    def process_to_IDs_in_sparse_format(self, sentences):
+        ids = [self.sp.EncodeAsIds(x) for x in sentences]
+        max_len = max(len(x) for x in ids)
+        dense_shape=(len(ids), max_len)
+        values=[item for sublist in ids for item in sublist]
+        indices=[[row, col] for row in range(len(ids)) for col in range(len(ids[row]))]
+        return (values, indices, dense_shape)
+
+    def encode(self, document):
+        values, indices, dense_shape = self.process_to_IDs_in_sparse_format([document])
+        return np.squeeze(self.sess.run(self.encoding,
+            feed_dict={ self.input.values: values,
+                        self.input.indices: indices,
+                        self.input.dense_shape: dense_shape}))
 
 
 class CorpusSearcher(object):
@@ -152,10 +189,12 @@ def get_vectorizer(vectorizer_type, vocabulary):
         return TfidfVectorizer(vocabulary=vocabulary)
     elif vectorizer_type == "bert":
         return BertVectorizer()
+    elif vectorizer_type == "universal_encoder_large":
+        return UniversalEncoderLargeVectorizer()
     elif vectorizer_type == "universal_encoder":
         return UniversalEncoderVectorizer()
-    elif vectorizer_type == "elmo":
-        return ELMoVectorizer()
+    elif vectorizer_type == "universal_encoder_lite":
+        return UniversalEncoderLiteVectorizer()
     else:
         raise Exception("Unknown vectorizer type: %s" % vectorizer_type)
 
