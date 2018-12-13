@@ -20,19 +20,22 @@
     "tgt_attribute_vocab": "data/amazon_shrunken/1.attribute_vocab.16k",
     "batch_size": 32,
     "max_len": 50,
-    "working_dir": "transfer"
+    "working_dir": "transfer",
+    "src_vectorizer": "count",
+    "tgt_train_vectorizer": "count",
+    "tgt_test_vectorizer": "universal_encoder"
   },
   "model": {
-      "model_type": "delete_retrieve",
-      "emb_dim": 128,
-      "attention": false,
-      "encoder": "lstm",
-      "src_hidden_dim": 512,
-      "src_layers": 1,
-      "bidirectional": true,
-      "tgt_hidden_dim": 512,
-      "tgt_layers": 1,
-      "decode": "greedy",
-      "dropout": 0.2
+    "model_type": "delete_retrieve",
+    "emb_dim": 128,
+    "attention": false,
+    "encoder": "lstm",
+    "src_hidden_dim": 512,
+    "src_layers": 1,
+    "bidirectional": true,
+    "tgt_hidden_dim": 512,
+    "tgt_layers": 1,
+    "decode": "greedy",
+    "dropout": 0.2
   }
 }

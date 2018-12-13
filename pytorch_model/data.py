@@ -8,6 +8,10 @@ from bert_serving.client import BertClient
 import torch
 from torch.autograd import Variable
 
+import tensorflow as tf
+tf.logging.set_verbosity(tf.logging.ERROR)
+import tensorflow_hub as hub
+
 from cuda import CUDA
 
 
@@ -15,11 +19,33 @@ class BertVectorizer(object):
     def __init__(self):
         self.bc = BertClient()
 
-    def fit(self, dummy):
-        print("Fitted")
+    def fit(self, documents):
+        return
 
     def transform(self, documents):
-        return self.bc.encode(documents)
+        encodings = self.bc.encode([doc if doc else " " for doc in documents if doc])
+        return np.squeeze(encodings)
+
+
+class TFHubVectorizer(object):
+    def __init__(self):
+        self.inputs = tf.placeholder(tf.string, shape=(None))
+        self.encodings = self.embed(self.inputs)
+        self.sess = tf.Session()
+        self.sess.run([tf.global_variables_initializer(), tf.tables_initializer()])
+
+    def fit(self, documents):
+        return
+
+    def transform(self, documents):
+        return self.sess.run(self.embed(documents))
+
+
+class UniversalEncoderVectorizer(TFHubVectorizer):
+    def __init__(self):
+        self.embed = hub.Module("https://tfhub.dev/google/universal-sentence-encoder-large/3")
+        super(UniversalEncoderVectorizer, self).__init__()
+
 
 class CorpusSearcher(object):
     def __init__(self, query_corpus, key_corpus, value_corpus, vectorizer, make_binary=True):
@@ -31,18 +57,34 @@ class CorpusSearcher(object):
         self.value_corpus = value_corpus
         
         # rows = docs, cols = features
-        self.key_corpus_matrix = self.vectorizer.transform(key_corpus)
+        self.key_corpus_matrix = self.vectorizer.transform(self.key_corpus)
         if make_binary:
             self.key_corpus_matrix = (self.key_corpus_matrix != 0).astype(int) # make binary
 
         
     def most_similar(self, key_idx, n=10):
-        query = self.query_corpus[key_idx]
+        # print(self.key_corpus)
+        # print("key_corpus_matrix: {}".format(self.key_corpus_matrix))
+        # print(type(self.key_corpus_matrix))
+        # print(self.key_corpus_matrix.shape)
 
+        query = self.query_corpus[key_idx]
         query_vec = self.vectorizer.transform([query])
+        # print(query)
+        # print("query_vec: {}".format(query_vec))
+        # print(type(query_vec))
+        # print(query_vec.shape)
 
         scores = np.dot(self.key_corpus_matrix, query_vec.T)
-        scores = np.squeeze(scores.toarray())
+        # print("scores: {}".format(scores))
+        # print(type(scores))
+        try:
+            scores = np.squeeze(scores.toarray())
+        except:
+            scores = np.squeeze(scores)
+        # print("post squeeze scores: {}".format(scores))
+        # print(type(scores))
+        # print(scores.shape)
         scores_indices = zip(scores, range(len(scores)))
         selected = sorted(scores_indices, reverse=True)[:n]
 
@@ -92,6 +134,21 @@ def extract_attributes(line, attribute_vocab):
     return line, content, attribute
 
 
+def get_vectorizer(vectorizer_type, vocabulary):
+    if vectorizer_type == "count":
+        return CountVectorizer(vocabulary=vocabulary)
+    elif vectorizer_type == "tfidf":
+        return TfidfVectorizer(vocabulary=vocabulary)
+    elif vectorizer_type == "bert":
+        return BertVectorizer()
+    elif vectorizer_type == "universal_encoder":
+        return UniversalEncoderVectorizer()
+    elif vectorizer_type == "elmo":
+        return ELMoVectorizer()
+    else:
+        raise Exception("Unknown vectorizer type: %s" % vectorizer_type)
+
+
 def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=None):
     attribute_vocab = set([x.strip() for x in open(attribute_vocab)])
 
@@ -107,8 +164,8 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
         query_corpus=[' '.join(x) for x in src_attribute],
         key_corpus=[' '.join(x) for x in src_attribute],
         value_corpus=[' '.join(x) for x in src_attribute],
-        vectorizer=BertVectorizer(),#CountVectorizer(vocabulary=src_tok2id),
-        make_binary=True
+        vectorizer=get_vectorizer(config['data']['src_vectorizer'], src_tok2id),
+        make_binary=True if config['data']['src_vectorizer'] in ('count', 'tfidf') else False
     )
     src = {
         'data': src_lines, 'content': src_content, 'attribute': src_attribute,
@@ -126,8 +183,8 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
             query_corpus=[' '.join(x) for x in tgt_attribute],
             key_corpus=[' '.join(x) for x in tgt_attribute],
             value_corpus=[' '.join(x) for x in tgt_attribute],
-            vectorizer=BertVectorizer(),#CountVectorizer(vocabulary=tgt_tok2id),
-            make_binary=True
+            vectorizer=get_vectorizer(config['data']['tgt_train_vectorizer'], tgt_tok2id),
+            make_binary=True if config['data']['src_vectorizer'] in ('count', 'tfidf') else False
         )
     # at test time, use test src-side content to scan through train tgt-side content
     #     (using tfidf) and retrieve corresponding attributes
@@ -136,7 +193,7 @@ def read_nmt_data(src, config, tgt, attribute_vocab, train_src=None, train_tgt=N
             query_corpus=[' '.join(x) for x in src_content],
             key_corpus=[' '.join(x) for x in train_tgt['content']],
             value_corpus=[' '.join(x) for x in train_tgt['attribute']],
-            vectorizer=BertVectorizer(),#TfidfVectorizer(vocabulary=tgt_tok2id),
+            vectorizer=get_vectorizer(config['data']['tgt_test_vectorizer'], tgt_tok2id),
             make_binary=False
         )
     tgt = {
